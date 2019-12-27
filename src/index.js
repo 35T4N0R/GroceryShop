@@ -1,12 +1,40 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import React from "react";
+import ReactDOM from "react-dom";
 
-ReactDOM.render(<App />, document.getElementById('root'));
+import App from "./App";
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+import { createStore, applyMiddleware } from "redux";
+import { connect, Provider } from "react-redux";
+import root_reducers from "./components/reducers";
+import {
+  showAll,
+  addProduct,
+  editProduct,
+  removeProduct
+} from "./components/actions/actions";
+import thunk from "redux-thunk";
+import "./index.css";
+
+const store = createStore(root_reducers, applyMiddleware(thunk));
+
+const mapStateToProps = state => {
+  return { ...state };
+};
+const mapDispatchToProps = dispatch => {
+  return {
+    showAll: () => dispatch(showAll()),
+    addProduct: new_product => dispatch(addProduct({ data: new_product })),
+    editProduct: (updated_product, id) =>
+      dispatch(editProduct({ data: updated_product, id: id })),
+    removeProduct: (removed_product, id) =>
+      dispatch(removeProduct({ data: removed_product, id: id }))
+  };
+};
+
+const ManageProducts = connect(mapStateToProps, mapDispatchToProps)(App);
+ReactDOM.render(
+  <Provider store={store}>
+    <ManageProducts />
+  </Provider>,
+  document.getElementById("root")
+);

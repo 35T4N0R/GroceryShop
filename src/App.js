@@ -1,26 +1,46 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import Menu from "./components/Menu";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
+import Home from "./components/Home";
+import Cart from "./components/Cart";
+import ManageProducts from "./components/ManageProducts";
+import ProductsOrder from "./components/ProductsOrder";
+import Orders from "./components/Orders";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  render() {
+    const { products } = this.props;
+    return (
+      <div className='App'>
+        <BrowserRouter>
+          <Menu />
+
+          <Switch>
+            <Route exact path='/' component={Home} />
+            <Route
+              path='/cart'
+              render={() => <Cart products={products.addedItems} />}
+            />
+            <Route path='/manage' component={ManageProducts} />
+            <Route
+              path='/order'
+              render={() => (
+                <ProductsOrder
+                  fields={{
+                    imie: ["text"],
+                    nazwisko: ["text"],
+                    adres: ["text"]
+                  }}
+                />
+              )}
+            />
+            )} />
+            <Route path='/orders' component={Orders} />
+          </Switch>
+        </BrowserRouter>
+      </div>
+    );
+  }
 }
 
 export default App;
