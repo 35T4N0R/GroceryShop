@@ -8,62 +8,85 @@ import {
   addSuma
 } from "./actions/actions";
 import "../index.css";
-import Select from 'react-select';
+import Select from "react-select";
 
 const options = [
-  { value: 'reset', label: 'Kolejność Podstawowa' },
-  { value: 'nazwa_asc', label: 'Nazwy - od A do Z' },
-  { value: 'nazwa_desc', label: 'Nazwy - od Z do A' },
-  { value: 'producent_asc', label: 'Producenta - od A do Z' },
-  { value: 'producent_desc', label: 'Producenta - od Z do A' },
-  { value: 'cena_asc', label: 'Ceny Rosnąco' },
-  { value: 'cena_desc', label: 'Ceny Malejąco' },
+  { value: "reset", label: "Kolejność Podstawowa" },
+  { value: "nazwa_asc", label: "Nazwy - od A do Z" },
+  { value: "nazwa_desc", label: "Nazwy - od Z do A" },
+  { value: "producent_asc", label: "Producenta - od A do Z" },
+  { value: "producent_desc", label: "Producenta - od Z do A" },
+  { value: "cena_asc", label: "Ceny Rosnąco" },
+  { value: "cena_desc", label: "Ceny Malejąco" }
 ];
 
-
 function Home(props) {
+  let [searchTerm, setSearchTerm] = useState(null);
+  const handleSearch = event => {
+    setSearchTerm(event.target.value);
+  };
+  const results =
+    !searchTerm || searchTerm === ""
+      ? props.products
+      : props.products.filter(prod =>
+          prod.nazwa.toLowerCase().includes(searchTerm.toLocaleLowerCase())
+        );
 
   const [selectedOption, setSelectedOption] = useState(null);
-
 
   let handleChange = selectedOption => {
     setSelectedOption(selectedOption);
     console.log(`Option selected:`, selectedOption);
-    switch(selectedOption.value){
-      case 'reset':
-        props.products.sort((a, b) => (a.id > b.id) ? 1 : -1)
+    switch (selectedOption.value) {
+      case "reset":
+        props.products.sort((a, b) => (a.id > b.id ? 1 : -1));
         break;
-      case 'cena_asc':
-        props.products.sort((a, b) => (a.cena > b.cena) ? 1 :(a.cena === b.cena) ? ((a.nazwa > b.nazwa) ? 1 : -1): -1)
+      case "cena_asc":
+        props.products.sort((a, b) =>
+          a.cena > b.cena
+            ? 1
+            : a.cena === b.cena
+            ? a.nazwa > b.nazwa
+              ? 1
+              : -1
+            : -1
+        );
         break;
-      case 'cena_desc':
-        props.products.sort((a, b) => (a.cena < b.cena) ? 1 :(a.cena === b.cena) ? ((a.nazwa > b.nazwa) ? 1 : -1): -1)
+      case "cena_desc":
+        props.products.sort((a, b) =>
+          a.cena < b.cena
+            ? 1
+            : a.cena === b.cena
+            ? a.nazwa > b.nazwa
+              ? 1
+              : -1
+            : -1
+        );
         break;
-      case 'nazwa_asc':
-        props.products.sort((a, b) => (a.nazwa > b.nazwa) ? 1 : -1)
+      case "nazwa_asc":
+        props.products.sort((a, b) => (a.nazwa > b.nazwa ? 1 : -1));
         break;
-      case 'nazwa_desc':
-        props.products.sort((a, b) => (a.nazwa < b.nazwa) ? 1 : -1)
+      case "nazwa_desc":
+        props.products.sort((a, b) => (a.nazwa < b.nazwa ? 1 : -1));
         break;
-      case 'producent_asc':
-        props.products.sort((a, b) => (a.producent > b.producent) ? 1 : -1)
+      case "producent_asc":
+        props.products.sort((a, b) => (a.producent > b.producent ? 1 : -1));
         break;
-      case 'producent_desc':
-        props.products.sort((a, b) => (a.producent < b.producent) ? 1 : -1)
+      case "producent_desc":
+        props.products.sort((a, b) => (a.producent < b.producent ? 1 : -1));
         break;
       default:
         props.products.map();
     }
     console.log(props.products);
   };
-  
 
   useEffect(() => {
     props.showAll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  let itemList = props.products.map(item => {
+  let itemList = results.map(item => {
     return (
       <div className='card' key={item.id}>
         <div className='card-image'>
@@ -101,20 +124,30 @@ function Home(props) {
       </div>
     );
   });
-  return (
-    <div><h3 className='center '>Produkty w sklepie</h3>
-    <h5>Posortuj według:</h5>
-<Select
-  value={selectedOption}
-  onChange={handleChange}
-  options={options}
-/>
-    <div className='box'>{itemList}</div>
+  if (!searchTerm) {
+    searchTerm = "";
+  }
 
+  return (
+    <div style={{ padding: 30 }}>
+      <h3 className='center'>Produkty w sklepie</h3>
+      <h5>Wyszukaj produkt:</h5>
+      <input
+        type='text'
+        placeholder='Search'
+        value={searchTerm}
+        onChange={handleSearch}
+      />
+      <h5>Posortuj według:</h5>
+      <Select
+        value={selectedOption}
+        onChange={handleChange}
+        options={options}
+      />
+      <div className='box'>{itemList}</div>
     </div>
   );
 }
-
 
 const mapStateToProps = state => {
   return {
